@@ -1,13 +1,16 @@
 const express = require('express')
 const app = express()
 const port = 5000
+
+const config = require('./config/key')
+
 const { User } = require('./models/User')
 
 app.use(express.urlencoded( {extended : true } ));
 app.use(express.json())
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb+srv://dnrl24a:1q2w3e!@youtube-clone-m9s0r.mongodb.net/test?retryWrites=true&w=majority', {
+mongoose.connect(config.mongoURI, {
   useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
 }).then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err))
