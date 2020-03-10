@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const jwt = require('jsonwebtoken')
 
 const userSchema = mongoose.Schema({
   name: {
@@ -46,9 +47,29 @@ userSchema.pre('save', function(next) {
         next()
       })
     })  
+  } else {
+    next()
   }
 })
 
+userSchema.methods.comparePassword = function(plainPassword, cb) {
+  // plainPassword 1q2w3e!  암호화된 비밀번호랑 비교해야함
+  bcrypt.compare(plainPassword, this.password, function(err, isMatch) {
+    if(err) return cb(err)
+    cb(null, isMatch)
+  })
+}
+
+userSchema.methods.generateToken = function(cb) {
+  const user = this;
+  const token = jwt.sign(user._id.toString(), 'secretToken')
+
+  user.token = token
+  user.save(function(err, user) {
+     if(err) return cb(err)
+     cb(null, user)
+  })
+}
 const User = mongoose.model('User', userSchema)
 
 module.exports = { User }
